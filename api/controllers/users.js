@@ -10,20 +10,22 @@ async function create(req, res) {
   const email = req.body.email;
   const password = req.body.password;
 
-  const saltRounds = 12;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  const user = new User({ firstname, lastname, email, password: hashedPassword });
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
 
-  user
-    .save()
-    .then((user) => {
-      console.log("User created, id:", user._id.toString());
-      res.status(201).json({ message: "OK" });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(400).json({ message: "Something went wrong" });
-    });
+  try {
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const user = new User({ firstname, lastname, email, password: hashedPassword });
+
+    const savedUser = await user.save();
+    console.log("User created, id:", savedUser._id.toString());
+    return res.status(201).json({ message: "OK" });
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({ message: "Something went wrong" });
+  }
 }
 
 async function editUser(req, res) {
