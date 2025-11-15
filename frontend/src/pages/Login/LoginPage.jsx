@@ -19,17 +19,22 @@ import {
 import { Input } from "@/components/ui/input";
 import "../../App.css";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (submitting) return;
+
     try {
+      setSubmitting(true);
       const token = await login(email, password);
-      console.log(token)
       const data = await getUserByEmail(email);
       localStorage.setItem("token", token);
       navigate(
@@ -40,6 +45,8 @@ export function LoginPage() {
     } catch (err) {
       toast.error(err.message);
       navigate("/login");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -100,16 +107,16 @@ export function LoginPage() {
                         id="submit"
                         type="submit"
                         value="Submit"
-                      className='bg-[#FFD300] text-[#0A2243] hover:bg-[#0A2243] hover:text-[#FFD300]'
+                        className="bg-[#FFD300] text-[#0A2243] hover:bg-[#0A2243] hover:text-[#FFD300]"
+                        disabled={submitting}
                       >
-                        Login
+                        {submitting ? <Spinner /> : "Login"}
                       </Button>
                       <FieldDescription className="px-6 text-center">
                         Dont have an account?
                         <Button
                           variant={"link"}
                           onClick={() => navigate("/signup")}
-                          
                         >
                           Sign in
                         </Button>
