@@ -5,17 +5,17 @@ const User = require("../../models/user");
 
 describe("/tokens", () => {
   beforeAll(async () => {
+    const bcrypt = require('bcryptjs');
+    const saltRounds = 12;
+    const hashed = await bcrypt.hash("12345678", saltRounds);
+
     const user = new User({
       firstname: "auth",
       lastname: "test",
       email: "auth-test@test.com",
-      password: "12345678",
+      password: hashed,
     });
 
-    // We need to use `await` so that the "beforeAll" setup function waits for
-    // the asynchronous user.save() to be done before exiting.
-    // Otherwise, the tests belowc ould run without the user actyakkt being
-    // saved, causing tests to fail inconsistently.
     await user.save();
   });
 
