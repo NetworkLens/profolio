@@ -15,6 +15,11 @@ async function create(req, res) {
   }
 
   try {
+     const exists = await User.findOne({ email: email });
+      if (exists) {
+        console.log("Auth Error: Email already in use");
+        return res.status(401).json({ message: "Email already in use" });
+      }
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const user = new User({ firstname, lastname, email, password: hashedPassword });
